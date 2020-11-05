@@ -7,6 +7,7 @@
             <v-list-item
               v-for="navigationButton in navigationButtons"
               :key="navigationButton.name"
+              :to="navigationButton.path"
             >
               <v-list-item-icon>
                 <v-icon>{{ navigationButton.icon }}</v-icon>
@@ -36,6 +37,8 @@
           :key="navigationButton.name"
           class="hidden-xs-only mx-2"
           color="secondary"
+          nuxt
+          :to="navigationButton.path"
         >
           <v-icon left>{{ navigationButton.icon }}</v-icon>
           {{ navigationButton.name }}
@@ -61,10 +64,12 @@ export default {
         {
           name: 'Log In',
           icon: 'mdi-login',
+          path: '/login',
         },
         {
           name: 'Sign Up',
           icon: 'mdi-account-plus',
+          path: 'signup',
         },
       ]
       return items
