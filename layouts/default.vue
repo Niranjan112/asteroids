@@ -25,9 +25,11 @@
           class="hidden-sm-and-up"
           @click.stop="drawer = !drawer"
         ></v-app-bar-nav-icon>
-        <v-toolbar-title class="primary--text font-weight-bold text-h5"
-          >Asteroids</v-toolbar-title
-        >
+        <v-toolbar-title class="primary--text font-weight-bold text-h5">
+          <NuxtLink to="/" :style="{ textDecoration: 'none' }"
+            >Asteroids</NuxtLink
+          >
+        </v-toolbar-title>
         <v-spacer></v-spacer>
         <v-btn
           v-for="navigationButton in navigationButtons"
@@ -40,7 +42,9 @@
         </v-btn>
       </v-app-bar>
     </div>
-    <nuxt />
+    <v-main class="primary d-flex justify-center align-center">
+      <nuxt />
+    </v-main>
   </v-app>
 </template>
 

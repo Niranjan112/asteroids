@@ -71,7 +71,7 @@ export default {
           primary: '#343F74',
           accent: colors.grey.darken3,
           secondary: colors.yellow.darken3,
-          info: colors.teal.lighten1,
+          info: colors.blueGrey.darken1,
           warning: colors.amber.base,
           error: colors.red.lighten2,
           success: colors.green.accent3,

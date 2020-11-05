@@ -115,9 +115,9 @@
 
 <script>
 export default {
-  async asyncData(context) {
-    const asteroidsList = await context.app.$axios.$get(
-      `https://api.nasa.gov/neo/rest/v1/neo/browse?page=0&size=10&api_key=${process.env.neoWsApiKey}`
+  async asyncData({ app, env }) {
+    const asteroidsList = await app.$axios.$get(
+      `https://api.nasa.gov/neo/rest/v1/neo/browse?page=0&size=10&api_key=${env.neoWsApiKey}`
     )
     return { asteroidsList }
   },
@@ -130,6 +130,10 @@ export default {
       search: '',
       searchId: '',
       headers: [
+        {
+          text: 'ID',
+          value: 'id',
+        },
         {
           text: 'Name',
           value: 'name',
@@ -157,6 +161,7 @@ export default {
     asteroidsListInTable() {
       return this.asteroidsList.near_earth_objects.map((asteroid) => {
         return {
+          id: asteroid.id,
           name: asteroid.name,
           estimated_diameter_max:
             asteroid.estimated_diameter.kilometers.estimated_diameter_max,
@@ -167,7 +172,13 @@ export default {
       })
     },
     dateRangeText() {
-      return this.dates.join(' ~ ')
+      return this.sortedDates.join(' ~ ')
+    },
+    sortedDates() {
+      const dateRange = [...this.dates]
+      return dateRange.sort((date1, date2) => {
+        return new Date(date1) - new Date(date2)
+      })
     },
     diffDates() {
       const date1 = new Date(this.dates[0])
@@ -179,10 +190,25 @@ export default {
   },
   methods: {
     searchAsteroidsByRange() {
-      console.log(this.$refs.rangeForm.validate())
+      if (this.$refs.rangeForm.validate()) {
+        this.$router.push({
+          name: 'asteroids-by-range',
+          query: {
+            startDate: this.sortedDates[0],
+            endDate: this.sortedDates[1],
+          },
+        })
+      }
     },
     searchAsteroidsById() {
-      console.log(this.$refs.idForm.validate())
+      if (this.$refs.idForm.validate()) {
+        this.$router.push({
+          name: 'asteroid-by-id-id',
+          params: {
+            id: this.searchId,
+          },
+        })
+      }
     },
     closeCalendar() {
       this.menu = false
