@@ -18,6 +18,15 @@
                 </v-list-item-title>
               </v-list-item-content>
             </v-list-item>
+
+            <v-list-item v-if="isUserLoggedIn" @click="logOut">
+              <v-list-item-icon>
+                <v-icon>mdi-logout</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                <v-list-item-title> Log Out </v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
           </v-list-item-group>
         </v-list>
       </v-navigation-drawer>
@@ -32,6 +41,7 @@
           >
         </v-toolbar-title>
         <v-spacer></v-spacer>
+        <p v-if="isUserLoggedIn" class="mt-4 text-sm-h6">Welcome</p>
         <v-btn
           v-for="navigationButton in navigationButtons"
           :key="navigationButton.name"
@@ -43,6 +53,15 @@
           <v-icon left>{{ navigationButton.icon }}</v-icon>
           {{ navigationButton.name }}
         </v-btn>
+        <v-btn
+          v-if="isUserLoggedIn"
+          class="hidden-xs-only mx-2"
+          color="secondary"
+          @click="logOut"
+        >
+          <v-icon left>mdi-logout</v-icon>
+          Log out
+        </v-btn>
       </v-app-bar>
     </div>
     <v-main class="primary d-flex justify-center align-center">
@@ -53,6 +72,7 @@
 
 <script>
 export default {
+  middleware: 'check-auth',
   data() {
     return {
       drawer: false,
@@ -60,7 +80,8 @@ export default {
   },
   computed: {
     navigationButtons() {
-      const items = [
+      let items = []
+      items = [
         {
           name: 'Log In',
           icon: 'mdi-login',
@@ -69,10 +90,28 @@ export default {
         {
           name: 'Sign Up',
           icon: 'mdi-account-plus',
-          path: 'signup',
+          path: '/signup',
         },
       ]
+
+      if (this.isUserLoggedIn) {
+        items = [
+          {
+            name: 'My Favourites',
+            icon: 'mdi-heart',
+            path: '/favourites',
+          },
+        ]
+      }
       return items
+    },
+    isUserLoggedIn() {
+      return this.$store.getters.getUser
+    },
+  },
+  methods: {
+    logOut() {
+      this.$store.dispatch('logOut')
     },
   },
 }

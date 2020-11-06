@@ -5,6 +5,7 @@
         {{ asteroid.name }}
         <v-spacer></v-spacer>
         <v-btn
+          v-if="isUserLoggedIn"
           icon
           color="red"
           title="Add to favourtes"
@@ -48,6 +49,11 @@ export default {
     return {
       liked: false,
     }
+  },
+  computed: {
+    isUserLoggedIn() {
+      return this.$store.getters.getUser
+    },
   },
 }
 </script>

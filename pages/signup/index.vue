@@ -1,6 +1,7 @@
 <template>
   <v-container>
-    <v-card class="mx-auto text-center pb-1" max-width="600">
+    <AlertBox />
+    <v-card class="mx-auto text-center pb-1" flat max-width="600">
       <v-card-subtitle class="justify-center">
         <h1 class="text-h4">Sign Up</h1>
       </v-card-subtitle>
@@ -11,29 +12,6 @@
           v-model="isSignUpFormValid"
           @submit.prevent="registerUser"
         >
-          <v-row>
-            <v-col cols="12" sm="6">
-              <v-text-field
-                v-model="firstName"
-                outlined
-                label="First Name"
-                :rules="nameRules"
-                color="secondary"
-              >
-              </v-text-field>
-            </v-col>
-            <v-col cols="12" sm="6">
-              <v-text-field
-                v-model="lastName"
-                outlined
-                label="Last Name"
-                :rules="nameRules"
-                color="secondary"
-              >
-              </v-text-field>
-            </v-col>
-          </v-row>
-
           <v-row>
             <v-col>
               <v-text-field
@@ -102,6 +80,7 @@
               color="secondary"
               min-width="150px"
               :disabled="!isSignUpFormValid"
+              :loading="loadingStatus"
               type="submit"
             >
               Sign Up
@@ -114,11 +93,15 @@
 </template>
 
 <script>
+import AlertBox from '@/components/AlertBox'
+
 export default {
+  components: {
+    AlertBox,
+  },
+  middleware: 'index-page-redirect',
   data() {
     return {
-      firstName: '',
-      lastName: '',
       email: '',
       password: '',
       confirmPassword: '',
@@ -126,10 +109,6 @@ export default {
       showConfirmPassword: false,
       isSignUpFormValid: false,
       showPasswordHint: false,
-      nameRules: [
-        (v) => !!v || 'This field is required',
-        (v) => /^[a-zA-Z ]{1,30}$/.test(v) || 'Only Alphabets allowed',
-      ],
       emailRules: [
         (v) => !!v || 'E-mail is required',
         (v) => /.+@.+\..+/.test(v) || 'E-mail is not valid',
@@ -150,6 +129,24 @@ export default {
           /(?=.*\W)/.test(value) || 'Atleast one symbol needed',
       },
     }
+  },
+  computed: {
+    loadingStatus() {
+      return this.$store.getters.getLoading
+    },
+  },
+  methods: {
+    async registerUser() {
+      if (this.$refs.signUpForm.validate()) {
+        await this.$store.dispatch('signUpUser', {
+          email: this.email,
+          password: this.password,
+        })
+        this.email = ''
+        this.password = ''
+        window.scrollTo(0, 0)
+      }
+    },
   },
 }
 </script>
