@@ -1,5 +1,6 @@
 <template>
   <v-container>
+    <AlertBox />
     <div v-for="date in sortedClosetApproachDates" :key="date" class="my-5">
       <h1 class="text-h5 text-sm-h4 white--text text-center my-5">
         {{ date }}
@@ -16,17 +17,7 @@
             <v-card-title
               >{{ asteroid.name }}
               <v-spacer></v-spacer>
-              <v-btn
-                v-if="isUserLoggedIn"
-                icon
-                color="red"
-                title="Add to favourtes"
-                @click="liked = !liked"
-              >
-                <v-icon>
-                  {{ liked ? 'mdi-heart' : 'mdi-heart-outline' }}
-                </v-icon>
-              </v-btn>
+              <LikeButton :id="asteroid.id" />
               <v-btn
                 icon
                 color="secondary"
@@ -36,6 +27,7 @@
                 <v-icon> mdi-arrow-right-thick </v-icon>
               </v-btn>
             </v-card-title>
+            <v-card-subtitle>{{ asteroid.id }}</v-card-subtitle>
           </v-card>
         </v-col>
       </v-row>
@@ -44,18 +36,18 @@
 </template>
 
 <script>
+import AlertBox from '~/components/AlertBox'
+import LikeButton from '~/components/LikeButton'
 export default {
-  async asyncData({ app, query, env }) {
+  components: {
+    AlertBox,
+    LikeButton,
+  },
+  async asyncData({ app, query, env, store }) {
     const asteroids = await app.$axios.$get(
       `https://api.nasa.gov/neo/rest/v1/feed?start_date=${query.startDate}&end_date=${query.endDate}&detailed=true&api_key=${env.neoWsApiKey}`
     )
-
     return { asteroids }
-  },
-  data() {
-    return {
-      liked: false,
-    }
   },
   computed: {
     sortedClosetApproachDates() {
@@ -64,9 +56,6 @@ export default {
           return new Date(date2) - new Date(date1)
         }
       )
-    },
-    isUserLoggedIn() {
-      return this.$store.getters.getUser
     },
   },
   methods: {

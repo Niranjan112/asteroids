@@ -1,4 +1,4 @@
-import { auth } from '~/plugins/firebase'
+import { db, auth } from '~/plugins/firebase'
 
 export const strict = false
 
@@ -8,6 +8,7 @@ export const state = () => ({
   alertType: '',
   user: null,
   loading: false,
+  userFavourites: [],
 })
 
 export const mutations = {
@@ -25,6 +26,14 @@ export const mutations = {
   },
   setLoading(state, payload) {
     state.loading = payload
+  },
+  setUserFavourites(state, payload) {
+    state.userFavourites.push(payload)
+  },
+  removeUserFavourites(state, payload) {
+    state.userFavourites = state.userFavourites.filter(
+      (favourite) => favourite.documentId !== payload
+    )
   },
 }
 
@@ -77,10 +86,11 @@ export const actions = {
       commit('setLoading', false)
     }
   },
-  autoLogIn({ commit }) {
+  autoLogIn({ dispatch, commit }) {
     auth.onAuthStateChanged((user) => {
       if (user.emailVerified) {
         commit('setUser', user)
+        dispatch('loadFavourites', user.uid)
       }
     })
   },
@@ -116,6 +126,48 @@ export const actions = {
     commit('setAlertType', '')
     commit('setAlertText', '')
   },
+  async addToFavourites({ dispatch }, payload) {
+    try {
+      await db.collection('favourites').add(payload)
+    } catch (error) {
+      dispatch('manageAlertBox', {
+        alertType: 'error',
+        alertText: error.message,
+      })
+    }
+  },
+  loadFavourites({ commit }, payload) {
+    if (payload) {
+      db.collection('favourites')
+        .where('userId', '==', payload)
+        .orderBy('createdAt')
+        .onSnapshot((snapshot) => {
+          const changes = snapshot.docChanges()
+          changes.forEach((change) => {
+            if (change.type === 'added') {
+              const document = {
+                documentId: change.doc.id,
+                ...change.doc.data(),
+              }
+              commit('setUserFavourites', document)
+            }
+            if (change.type === 'removed') {
+              commit('removeUserFavourites', change.doc.id)
+            }
+          })
+        })
+    }
+  },
+  async removeFromFavourites({ dispatch }, payload) {
+    try {
+      await db.collection('favourites').doc(payload).delete()
+    } catch (error) {
+      dispatch('manageAlertBox', {
+        alertType: 'error',
+        alertText: error.message,
+      })
+    }
+  },
 }
 
 export const getters = {
@@ -133,5 +185,8 @@ export const getters = {
   },
   getLoading(state) {
     return state.loading
+  },
+  getUserFavourites(state) {
+    return state.userFavourites
   },
 }

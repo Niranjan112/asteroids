@@ -1,21 +1,11 @@
 <template>
   <v-container>
+    <AlertBox />
     <v-card width="600" class="mx-auto">
       <v-card-title class="info-text text-h5">
         {{ asteroid.name }}
         <v-spacer></v-spacer>
-        <v-btn
-          v-if="isUserLoggedIn"
-          icon
-          color="red"
-          title="Add to favourtes"
-          large
-          @click="liked = !liked"
-        >
-          <v-icon>
-            {{ liked ? 'mdi-heart' : 'mdi-heart-outline' }}
-          </v-icon>
-        </v-btn>
+        <LikeButton :id="asteroid.id" />
       </v-card-title>
       <v-card-subtitle class="ml-1"> ID: {{ asteroid.id }} </v-card-subtitle>
       <v-card-text class="text-body-1 info--text">
@@ -38,7 +28,13 @@
 </template>
 
 <script>
+import AlertBox from '~/components/AlertBox'
+import LikeButton from '~/components/LikeButton'
 export default {
+  components: {
+    AlertBox,
+    LikeButton,
+  },
   async asyncData({ app, params, env }) {
     const asteroid = await app.$axios.$get(
       `https://api.nasa.gov/neo/rest/v1/neo/${params.id}?api_key=${env.neoWsApiKey}`
@@ -51,9 +47,20 @@ export default {
     }
   },
   computed: {
-    isUserLoggedIn() {
+    user() {
       return this.$store.getters.getUser
     },
+    userFavourites() {
+      return this.$store.getters.getUserFavourites.map((asteroid) => {
+        return {
+          documentId: asteroid.documentId,
+          asteroidId: asteroid.asteroidId,
+        }
+      })
+    },
+  },
+  methods: {
+    addOrRemoveFavourites(id) {},
   },
 }
 </script>
