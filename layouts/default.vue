@@ -72,7 +72,7 @@
 
 <script>
 export default {
-  middleware: 'check-auth',
+  middleware: 'clear-alert',
   data() {
     return {
       drawer: false,

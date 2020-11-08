@@ -12,9 +12,13 @@ const firebaseConfig = {
   appId: '1:684682696560:web:1a4340de192e1b66b021b5',
 }
 // Initialize Firebase
-firebase.initializeApp(firebaseConfig)
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig)
+}
 export const db = firebase.firestore()
 export const auth = firebase.auth()
 export const timestamp = firebase.firestore.Timestamp
 
-export default firebase
+export default function ({ store }) {
+  store.dispatch('autoLogIn')
+}

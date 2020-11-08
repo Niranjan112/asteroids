@@ -38,7 +38,7 @@ export default {
     },
   },
   methods: {
-    addOrRemoveFavourites() {
+    async addOrRemoveFavourites() {
       if (!this.userFavourites.includes(this.id)) {
         this.$store.dispatch('addToFavourites', {
           asteroidId: this.id,
@@ -46,10 +46,14 @@ export default {
           createdAt: timestamp.fromDate(new Date()),
         })
       } else {
-        const { documentId } = this.$store.getters.getUserFavourites.find(
+        const {
+          documentId,
+          asteroidId,
+        } = this.$store.getters.getUserFavourites.find(
           (asteroid) => asteroid.asteroidId === this.id
         )
-        this.$store.dispatch('removeFromFavourites', documentId)
+        await this.$store.dispatch('removeFromFavourites', documentId)
+        this.$emit('send-id', asteroidId)
       }
     },
   },

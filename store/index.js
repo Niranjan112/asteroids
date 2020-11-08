@@ -35,6 +35,9 @@ export const mutations = {
       (favourite) => favourite.documentId !== payload
     )
   },
+  clearFavourites(state) {
+    state.userFavourites = []
+  },
 }
 
 export const actions = {
@@ -86,11 +89,13 @@ export const actions = {
       commit('setLoading', false)
     }
   },
-  autoLogIn({ dispatch, commit }) {
+  autoLogIn({ dispatch, commit, getters }) {
     auth.onAuthStateChanged((user) => {
       if (user.emailVerified) {
         commit('setUser', user)
-        dispatch('loadFavourites', user.uid)
+        if (!getters.userFavourites) {
+          dispatch('loadFavourites', user.uid)
+        }
       }
     })
   },
@@ -111,6 +116,7 @@ export const actions = {
   logOut({ commit }) {
     auth.signOut()
     commit('setUser', null)
+    commit('clearFavourites')
     this.$router.push({
       name: 'login',
     })
@@ -161,11 +167,13 @@ export const actions = {
   async removeFromFavourites({ dispatch }, payload) {
     try {
       await db.collection('favourites').doc(payload).delete()
+      return true
     } catch (error) {
       dispatch('manageAlertBox', {
         alertType: 'error',
         alertText: error.message,
       })
+      return false
     }
   },
 }
