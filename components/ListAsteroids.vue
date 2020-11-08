@@ -24,7 +24,7 @@
               <v-icon> mdi-arrow-right-thick </v-icon>
             </v-btn>
           </v-card-title>
-          <v-card-subtitle>{{ asteroid.id }}</v-card-subtitle>
+          <v-card-subtitle>ID: {{ asteroid.id }}</v-card-subtitle>
         </v-card>
       </v-col>
     </v-row>
