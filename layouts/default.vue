@@ -32,7 +32,7 @@
       </v-navigation-drawer>
       <v-app-bar flat>
         <v-app-bar-nav-icon
-          class="hidden-sm-and-up"
+          class="hidden-md-and-up"
           @click.stop="drawer = !drawer"
         ></v-app-bar-nav-icon>
         <v-toolbar-title class="primary--text font-weight-bold text-h5">
@@ -45,7 +45,7 @@
         <v-btn
           v-for="navigationButton in navigationButtons"
           :key="navigationButton.name"
-          class="hidden-xs-only mx-2"
+          class="hidden-sm-and-down mx-2"
           color="secondary"
           nuxt
           :to="navigationButton.path"
@@ -55,7 +55,7 @@
         </v-btn>
         <v-btn
           v-if="isUserLoggedIn"
-          class="hidden-xs-only mx-2"
+          class="hidden-sm-and-down mx-2"
           color="secondary"
           @click="logOut"
         >
@@ -83,6 +83,11 @@ export default {
       let items = []
       items = [
         {
+          name: 'Home',
+          icon: 'mdi-home',
+          path: '/',
+        },
+        {
           name: 'Log In',
           icon: 'mdi-login',
           path: '/login',
@@ -96,6 +101,11 @@ export default {
 
       if (this.isUserLoggedIn) {
         items = [
+          {
+            name: 'Home',
+            icon: 'mdi-home',
+            path: '/',
+          },
           {
             name: 'My Favourites',
             icon: 'mdi-heart',
