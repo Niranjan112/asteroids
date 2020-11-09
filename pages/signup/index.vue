@@ -142,8 +142,7 @@ export default {
           email: this.email,
           password: this.password,
         })
-        this.email = ''
-        this.password = ''
+        this.$refs.signUpForm.reset()
         window.scrollTo(0, 0)
       }
     },
